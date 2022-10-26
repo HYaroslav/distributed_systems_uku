@@ -1,10 +1,10 @@
 import logging
 import threading
 from typing import List
-import requests
+import socket
 import queue
 
-SECONDARY_ENDPOINT = "http://172.20.0.{host_address}:{port}/replicate_message"
+SECONDARY_LISTENER_ADDRESS = "172.20.0.{host_address}:{port}"
 
 class Replicator():
 
@@ -12,14 +12,14 @@ class Replicator():
     logger: logging.Logger
     replication_queue: queue.Queue
 
-    def __init__(self, start_port: int, secondaries_number: int, logger: logging.Logger) -> None:
-        self.logger = logger
+    def __init__(self, start_port: int, secondaries_number: int) -> None:
+        self.logger = logging.getLogger(__name__)
 
         self.logger.info("hello")
         
         for i in range(secondaries_number):
             # IPv4 for secondaries will start from 172.20.0.3
-            endpoint = SECONDARY_ENDPOINT.format(host_address=i+3, port=start_port+i)
+            endpoint = SECONDARY_LISTENER_ADDRESS.format(host_address=i+3, port=start_port+i+1)
             self.secondary_endpoints_list.append(endpoint)
 
         self.replication_queue = queue.Queue()
@@ -43,8 +43,12 @@ class Replicator():
 
         self.replication_queue.put([thread_list, thread_barrier])
 
-        thread_barrier.wait()
-
+        try:
+            thread_barrier.wait()
+        except threading.BrokenBarrierError:
+            self.logger.error("Some nodes take too long time to process.")
+            return
+        
         self.logger.info("Replication of msg='%s' to %s nodes was done successfuly!", data, secondaries_number)
 
 
@@ -63,11 +67,13 @@ class Replicator():
             self.logger.info("Queue - task done.")
     
     def _replicate(self, data: str, endpoint_url: str, thread_barrier: threading.Barrier):
-        response = requests.post(endpoint_url, json={"data":data})
-        
-        if response.status_code != 200:
-            self.logger.error(f"Error in replication: {response.json()}")
-        else:
-            self.logger.info(str(response.json()))
+        host, port = endpoint_url.split(":")
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((host, int(port)))
+            s.sendall(bytes(data, encoding="utf8"))
+
+            response_data = s.recv(1024).decode("utf-8")
+            self.logger.info(response_data)
+            s.close()
 
         thread_barrier.wait()

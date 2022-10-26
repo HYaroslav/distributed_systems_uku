@@ -13,7 +13,7 @@ MSG_LIST = []
 logging.basicConfig(level=logging.INFO)
 app = Flask("app")
 
-replicator = Replicator(start_port=SECONDARY_START_PORT, secondaries_number=SECONDARY_NUMBER, logger=app.logger)
+replicator = Replicator(start_port=SECONDARY_START_PORT, secondaries_number=SECONDARY_NUMBER)
 
 @app.route("/append_message", methods=["POST"])
 def append_message():

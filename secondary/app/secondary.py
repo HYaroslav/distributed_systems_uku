@@ -1,32 +1,18 @@
+import logging
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
+from werkzeug.serving import run_simple
 
-from time import sleep
-import random
+from replications_listener import ReplicationListener
 
 
-PORT = os.environ["PORT"]
+PORT = int(os.environ["PORT"])
+CURRENT_IP = os.environ["LISTENER_IP"]
 MSG_LIST = []
 
+logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.route("/replicate_message", methods=["POST"])
-def replication_listener():
-    global MSG_LIST
-
-    rand_int = random.randint(2, 5)
-    app.logger.info("Data will be replicated in %s seconds.", rand_int)
-    sleep(rand_int)
-
-    data = request.json["data"]
-    MSG_LIST.append(data)
-
-    return jsonify(f"Replication to http://localhost:{PORT} was done successfuly!")
+replication_listener = ReplicationListener(ip=CURRENT_IP, port=PORT)
 
 
 @app.route("/get_message", methods=["GET"])
@@ -36,4 +22,5 @@ def get_message():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=PORT)
+    replication_listener.listen(MSG_LIST)
+    run_simple("0.0.0.0", PORT, app, use_reloader=False)

@@ -33,6 +33,7 @@ HEADER
     ports:
       - "$SECONDARY_START_PORT:$SECONDARY_START_PORT"
     environment:
+      - LISTENER_IP=172.20.0.3
       - PORT=$(($SECONDARY_START_PORT))
     networks:
       distributed_system:
@@ -48,6 +49,7 @@ BLOCK
     ports:
       - "$(($SECONDARY_START_PORT+$i)):$(($SECONDARY_START_PORT+$i))"
     environment:
+      - LISTENER_IP=172.20.0.$(($i+3))
       - PORT=$(($SECONDARY_START_PORT+$i))
     networks:
       distributed_system:

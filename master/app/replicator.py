@@ -4,7 +4,6 @@ from typing import List
 import socket
 import queue
 
-SECONDARY_LISTENER_ADDRESS = "172.20.0.{host_address}:{port}"
 
 class Replicator():
 
@@ -12,13 +11,9 @@ class Replicator():
     logger: logging.Logger
     replication_queue: queue.Queue
 
-    def __init__(self, start_port: int, secondaries_number: int) -> None:
+    def __init__(self, secondary_endpoints_list) -> None:
         self.logger = logging.getLogger(__name__)
-        
-        for i in range(secondaries_number):
-            # IPv4 for secondaries will start from 172.20.0.3
-            endpoint = SECONDARY_LISTENER_ADDRESS.format(host_address=i+3, port=start_port+i+1)
-            self.secondary_endpoints_list.append(endpoint)
+        self.secondary_endpoints_list = secondary_endpoints_list
 
 
     def replicate(self, data: str):

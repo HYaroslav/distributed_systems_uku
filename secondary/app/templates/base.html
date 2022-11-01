@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secondary Node {{ node_id }}</title>
+    <style>
+        .message {
+            padding: 10px;
+            margin: 5px;
+            background-color: #f3f3f3
+        }
+        nav a {
+            color: #343233;
+            font-size: 2em;
+            margin: auto;
+            padding: 5px;
+            text-decoration: none;
+            border-left: 3px solid rgb(36, 36, 47);
+            border-right: 3px solid rgb(36, 36, 47);
+            height: 500px;
+        }
+        .alert-error {
+            padding: 20px;
+            margin: 5px;
+            color: #970020;
+            background-color: #ffd5de;
+        }
+        .alert-success {
+            padding: 20px;
+            margin: 5px;
+            color: #000000;
+            background-color: #4ea156;
+        }
+        .log {
+            margin: -10px;
+            margin-left: 0px;
+            font-size: small;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('get_message') }}">Secondary Node №{{ node_id }}</a>
+        <a href="{{ url_for('get_message') }}">Saved messages</a>
+        <a href="{{ url_for('get_logs') }}">Logs</a>
+    </nav>
+    <hr>
+    <div class="content">
+        {% for category, message in get_flashed_messages(with_categories=true) %}
+            {%- if category == 'error' -%}
+                <div class="alert-error">{{ message }}</div>
+            {%- endif -%}
+            {%- if category == 'success' -%}
+                <div class="alert-success">{{ message }}</div>
+            {%- endif -%}
+        {% endfor %}
+        {% block content %} {% endblock %}
+    </div>
+</body>
+</html>

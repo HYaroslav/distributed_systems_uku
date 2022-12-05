@@ -11,6 +11,14 @@
                   cols="60"
                   >{{ request.form['content'] }}</textarea>
         <br>
+        <label for="number">Write Concern (min=0, max={{ node_ip_list|length + 1 }})</label>
+        <br>
+        <input type="number"
+               name="write_concern"
+               min="0"
+               max="{{ node_ip_list|length + 1 }}"
+               value="{{ node_ip_list|length + 1 }}"
+        >
         <button type="submit">Submit</button>
     </form>
 {% endblock %}

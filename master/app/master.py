@@ -36,13 +36,18 @@ def home_page():
 def append_message():
     if request.method == "POST":
         global MSG_LIST
-        data = request.form['content']
+        if request.form:
+            data = request.form['content']
+            write_concern = int(request.form['write_concern'])
+        elif request.json:
+            data = request.json['content']
+            write_concern = int(request.json['write_concern'])
         
         if not data:
             flash("Content is required", category="error")
         else:
             MSG_LIST.append(data)
-            replicator.replicate(data)
+            replicator.replicate(data, write_concern)
             flash("Content is replicated", category="success")
 
     return render_template("append_form.html", node_ip_list=SECONDARY_LOCAL_IP_LIST)

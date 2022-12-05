@@ -33,9 +33,9 @@ def get_message():
     global MSG_LIST
 
     msg_list = []
-    for msg_index, msg in enumerate(reversed(MSG_LIST)):
+    for msg_index, msg in reversed(MSG_LIST):
         msg_list.append({
-            "title": f"Message {len(MSG_LIST)-msg_index}",
+            "title": f"Message {msg_index}",
             "content": msg
         })
 

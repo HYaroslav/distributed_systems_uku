@@ -6,6 +6,9 @@ from typing import List, Tuple
 from time import sleep
 import random
 
+MAX_DELAY = 5
+MIN_DELAY = 1
+
 class ReplicationListener():
 
     server_socket: socket.socket
@@ -65,7 +68,7 @@ class ReplicationListener():
                 message = dataFromClient["message"]
 
                 # imitate delays
-                rand_int = random.randint(2, 10)
+                rand_int = random.randint(MIN_DELAY, MAX_DELAY)
                 self.logger.info("Data will be replicated in %s seconds.", rand_int)
                 sleep(rand_int)
 

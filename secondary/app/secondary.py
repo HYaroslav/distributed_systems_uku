@@ -22,6 +22,10 @@ logging.getLogger().addHandler(logging.StreamHandler())
 app = Flask(__name__)
 replication_listener = ReplicationListener(ip=CURRENT_IP, port=PORT)
 
+@app.route("/~")
+def blank_page():
+    return ""
+
 
 @app.route("/")
 def home_page():

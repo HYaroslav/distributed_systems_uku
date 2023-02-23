@@ -32,9 +32,33 @@
             background-color: #4ea156;
         }
         .log {
-            margin: -10px;
+            margin: 1px;
             margin-left: 0px;
             font-size: small;
+        }
+        .node_healthy {
+            background-color: green;
+        }
+        .node_suspected {
+            background-color: yellow;
+        }
+        .node_unhealthy {
+            background-color: red;
+        }
+        .node_status_unknown {
+            background-color: white;
+        }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+        }
+        th, td {
+          padding: 8px;
+          text-align: left;
+          border: 1px solid black;
+        }
+        th {
+          background-color: #f2f2f2;
         }
     </style>
 </head>
@@ -44,6 +68,7 @@
         <a href="{{ url_for('get_message') }}">Saved messages</a>
         <a href="{{ url_for('append_message') }}">Append message</a>
         <a href="{{ url_for('get_logs') }}">Logs</a>
+        <a href="{{ url_for('get_health') }}">Health</a>
     </nav>
     <hr>
     <div class="nodes_list">

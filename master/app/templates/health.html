@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>{% block title2 %} Health {% endblock %}</h2>
+    <div class='health'>
+    <table>
+        <thead>
+            <tr>
+                <th>Node</th>
+                <th>URL</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for url, status in status_dict.items() %}
+            <tr>
+                <td>Secondary {{ loop.index }}</td>
+                <td><a href="{{ url }}">{{ url }}</a></td>
+                <td class="{{ status[1] }}">{{ status[0] }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock %}

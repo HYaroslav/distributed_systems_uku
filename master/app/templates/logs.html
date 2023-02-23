@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
     <h2>{% block title2 %} Logs {% endblock %}</h2>
-    {% for log in logs %}
-        <div class='log'>
-            <p>{{ log }}</p>
+        <div>
+        {% for log in logs %}
+            <p class='log'>{{ log }}</p>
+        {% endfor %}
         </div>
-    {% endfor %}
 {% endblock %}

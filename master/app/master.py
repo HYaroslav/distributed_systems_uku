@@ -3,12 +3,14 @@ import logging
 from flask import Flask, request, redirect, render_template, flash
 
 from replicator import Replicator
+from heartbeats import HeartBeater
 import utils
 
 PORT = os.environ["PORT"]
 SECONDARY_START_PORT = int(os.environ["SECONDARY_START_PORT"])
 SECONDARY_NUMBER = int(os.environ["SECONDARY_NUMBER"])
-SECONDARY_LISTENER_IP_LIST = utils.get_secondaries_listner_ip_list(SECONDARY_NUMBER, SECONDARY_START_PORT)
+SECONDARY_IP_LIST = utils.get_secondaries_ip_list(SECONDARY_NUMBER, SECONDARY_START_PORT)
+SECONDARY_LISTENER_IP_LIST = utils.get_secondaries_listener_ip_list(SECONDARY_NUMBER, SECONDARY_START_PORT)
 SECONDARY_LOCAL_IP_LIST = utils.get_secondaries_local_ip_list(SECONDARY_NUMBER, SECONDARY_START_PORT)
 
 MSG_LIST = []
@@ -24,7 +26,8 @@ logging.getLogger().addHandler(logging.StreamHandler())
 app = Flask("app")
 app.config['SECRET_KEY'] = os.urandom(24).hex()
 
-replicator = Replicator(SECONDARY_LISTENER_IP_LIST)
+heartbeater = HeartBeater(SECONDARY_IP_LIST)
+replicator = Replicator(SECONDARY_LISTENER_IP_LIST, heartbeater)
 
 
 @app.route("/")
@@ -73,6 +76,15 @@ def get_logs():
         logs = f.readlines()
 
     return render_template("logs.html", logs=logs, node_ip_list=SECONDARY_LOCAL_IP_LIST)
+
+
+@app.route("/get_health", methods=["GET"])
+def get_health():
+    status_dict = heartbeater.get_all_health_statuses()
+
+    status_dict = {f"http://localhost:{int(url.split(':')[-1])}/": [status.name, status.value] for url, status in status_dict.items()}
+
+    return render_template("health.html", status_dict=status_dict, node_ip_list=SECONDARY_LOCAL_IP_LIST)
 
 
 if __name__ == "__main__":    
